@@ -1,0 +1,10 @@
+vendor
+*.exe
+*.out
+*.xml
+*.log
+*.db
+output
+data.xlsx
+output*
+

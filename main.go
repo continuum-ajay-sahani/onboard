@@ -26,9 +26,10 @@ var scriptIDs = []string{
 }
 
 const (
-	dataExcelIndex = 1
-	endPointOffset = 7
-	totalRowSize   = 71
+	dataExcelTabIndex = 1
+	endPointOffset    = 7
+	totalRowSize      = 71
+	dateToday         = "18Jan18"
 )
 
 var upFileName string
@@ -61,7 +62,7 @@ func readDataFile() {
 	}
 	fmt.Println("file open success")
 	for index, sheet := range xlFile.Sheets {
-		if index != dataExcelIndex {
+		if index != dataExcelTabIndex {
 			continue
 		}
 		for rowIndex, row := range sheet.Rows {
@@ -92,8 +93,8 @@ func createOutputFile(rowIndex int) error {
 	}
 	timestamp += 2
 	batch := (rowIndex / 7) + 1
-	upFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_17Jan18.up", timestamp, batch)
-	downFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_17Jan18.down", timestamp, batch)
+	upFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.up", timestamp, batch, dateToday)
+	downFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.down", timestamp, batch, dateToday)
 	deleteFile(upFileName)
 	deleteFile(downFileName)
 	err := createFile(upFileName)
