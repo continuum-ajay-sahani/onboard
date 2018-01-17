@@ -39,19 +39,24 @@ var downCounter int
 var timestamp int
 
 func main() {
-	t := time.Now()
-	time, err := strconv.Atoi(t.Format("20060102150405"))
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	timestamp = time
+	initTimeStamp()
 	createDirIfNotExist("output")
 	readDataFile()
 	fmt.Println("Total Up Record=", upCounter)
 	fmt.Println("Total Up Row=", upCounter/len(scriptIDs))
 	fmt.Println("Total Down Record=", downCounter)
 	fmt.Println("Total Down Row=", downCounter/len(scriptIDs))
+}
+
+func initTimeStamp() error {
+	t := time.Now()
+	time, err := strconv.Atoi(t.Format("20060102150405"))
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	timestamp = time
+	return nil
 }
 
 func readDataFile() {
