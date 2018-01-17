@@ -26,7 +26,9 @@ var scriptIDs = []string{
 }
 
 const (
+	dataExcelIndex = 1
 	endPointOffset = 7
+	totalRowSize   = 71
 )
 
 var upFileName string
@@ -59,10 +61,13 @@ func readDataFile() {
 	}
 	fmt.Println("file open success")
 	for index, sheet := range xlFile.Sheets {
-		if index != 1 {
+		if index != dataExcelIndex {
 			continue
 		}
 		for rowIndex, row := range sheet.Rows {
+			if rowIndex >= totalRowSize {
+				break
+			}
 			if rowIndex%endPointOffset == 0 {
 				createOutputFile(rowIndex)
 			}
@@ -116,6 +121,7 @@ func appendFileFooter(fileName string) {
 }
 
 func createCqlsFile(rowData []string) {
+	fmt.Println(rowData)
 	endpointid := rowData[0]
 	partnerid := rowData[1]
 	siteid := rowData[2]
