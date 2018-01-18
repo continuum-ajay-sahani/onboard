@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ContinuumLLC/onboarding/combine"
+	"github.com/ContinuumLLC/onboarding/constdata"
 	"github.com/tealeg/xlsx"
 )
 
@@ -25,13 +27,6 @@ var scriptIDs = []string{
 	"c704ead5-82df-4faa-8986-cfa1a4b9a250",
 }
 
-const (
-	dataExcelTabIndex = 1
-	endPointOffset    = 7
-	totalRowSize      = 71
-	dateToday         = "18Jan18"
-)
-
 var upFileName string
 var downFileName string
 var upCounter int
@@ -39,6 +34,11 @@ var downCounter int
 var timestamp int
 
 func main() {
+	//createDataFlow()
+	combine.ProcessCombine()
+}
+
+func createDataFlow() {
 	initTimeStamp()
 	createDirIfNotExist("output")
 	readDataFile()
@@ -47,7 +47,6 @@ func main() {
 	fmt.Println("Total Down Record=", downCounter)
 	fmt.Println("Total Down Row=", downCounter/len(scriptIDs))
 }
-
 func initTimeStamp() error {
 	t := time.Now()
 	time, err := strconv.Atoi(t.Format("20060102150405"))
@@ -65,16 +64,16 @@ func readDataFile() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("file open success")
+	//fmt.Println("file open success")
 	for index, sheet := range xlFile.Sheets {
-		if index != dataExcelTabIndex {
+		if index != constdata.DataExcelTabIndex {
 			continue
 		}
 		for rowIndex, row := range sheet.Rows {
-			if rowIndex >= totalRowSize {
+			if rowIndex >= constdata.TotalRowSize {
 				break
 			}
-			if rowIndex%endPointOffset == 0 {
+			if rowIndex%constdata.EndPointOffset == 0 {
 				createOutputFile(rowIndex)
 			}
 			if rowIndex == 0 {
@@ -82,9 +81,13 @@ func readDataFile() {
 				continue
 			}
 			var partnerData []string
-			for _, cell := range row.Cells {
+			for cellIndex, cell := range row.Cells {
 				text := cell.String()
 				partnerData = append(partnerData, text)
+				if cellIndex == 3 {
+					fmt.Print(text)
+					fmt.Print(",")
+				}
 			}
 			createCqlsFile(partnerData)
 		}
@@ -98,8 +101,8 @@ func createOutputFile(rowIndex int) error {
 	}
 	timestamp += 2
 	batch := (rowIndex / 7) + 1
-	upFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.up", timestamp, batch, dateToday)
-	downFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.down", timestamp, batch, dateToday)
+	upFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.up", timestamp, batch, constdata.DateToday)
+	downFileName = fmt.Sprintf("output/%v_partner_endpoint_mapping_prod_Batch%d_%s.down", timestamp, batch, constdata.DateToday)
 	deleteFile(upFileName)
 	deleteFile(downFileName)
 	err := createFile(upFileName)
@@ -127,7 +130,7 @@ func appendFileFooter(fileName string) {
 }
 
 func createCqlsFile(rowData []string) {
-	fmt.Println(rowData)
+	//fmt.Println(rowData)
 	endpointid := rowData[0]
 	partnerid := rowData[1]
 	siteid := rowData[2]
