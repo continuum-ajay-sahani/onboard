@@ -12,7 +12,40 @@ var outputrow [][]string
 
 //ProcessCombine combine data
 func ProcessCombine() {
-	combineData()
+	//combineData()
+	getSiteCount()
+}
+
+func getSiteCount() {
+	excelFileName := "data.xlsx"
+	xlFile, err := xlsx.OpenFile(excelFileName)
+	if err != nil {
+		fmt.Println(err)
+	}
+	siteNameCount := make(map[string]int)
+	for index, sheet := range xlFile.Sheets {
+		if index != 5 {
+			continue
+		}
+		for rowIndex, row := range sheet.Rows {
+			if rowIndex >= constdata.TotalRowSize {
+				break
+			}
+			if rowIndex == 0 {
+				// Ignore header row
+				continue
+			}
+			for cellIndex, cell := range row.Cells {
+				if cellIndex == 4 {
+					siteName := cell.String()
+					value, _ := siteNameCount[siteName]
+					value++
+					siteNameCount[siteName] = value
+				}
+			}
+		}
+	}
+	fmt.Println(siteNameCount)
 }
 
 func getLegacyRegID() {
